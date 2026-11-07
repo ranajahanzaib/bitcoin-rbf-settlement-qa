@@ -1,33 +1,52 @@
-name: CI
-
+name: Go and Bitcoin regtest
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
+permissions:
+  contents: read
 jobs:
-  build:
+  go:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: 20
-
-      # Uncomment and adjust the steps below to match your project's setup
-
-      # - name: Install dependencies
-      #   run: npm ci
-
-      # - name: Lint
-      #   run: npm run lint
-
-      # - name: Run tests
-      #   run: npm test
-
-      # - name: Build
-      #   run: npm run build
+          go-version-file: go.mod
+          cache: true
+      - run: test -z "$(gofmt -l cmd internal test examples)"
+      - run: go vet ./...
+      - run: go test -race ./...
+      - run: go build ./cmd/rbfqa
+      - name: Cross-platform build
+        run: |
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o /tmp/rbfqa-mac ./cmd/rbfqa
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/rbfqa-linux ./cmd/rbfqa
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/rbfqa.exe ./cmd/rbfqa
+  bitcoin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: scripts/install-core.sh .tools/bitcoin-32.1
+      - run: go build -o bin/rbfqa ./cmd/rbfqa
+      - run: bin/rbfqa doctor --bitcoind "$PWD/.tools/bitcoin-32.1/bin/bitcoind"
+      - run: bin/rbfqa run all --bitcoind "$PWD/.tools/bitcoin-32.1/bin/bitcoind" --timeout 10m
+      - name: Real-node integration and negative detection tests
+        env:
+          RBFQA_BITCOIND: ${{ github.workspace }}/.tools/bitcoin-32.1/bin/bitcoind
+          RBFQA_TEST_ARTIFACTS: ${{ github.workspace }}/artifacts/integration
+        run: go test -count=1 -v -timeout 10m ./test/integration
+      - name: Offline accounting replay
+        run: for report in artifacts/*/report.json; do bin/rbfqa replay "$report"; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regtest-evidence
+          path: artifacts/
+          retention-days: 7

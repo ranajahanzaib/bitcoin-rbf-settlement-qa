@@ -1,0 +1,8 @@
+# Run only managed regtest nodes, never a production wallet or remote node.
+bitcoind: bitcoind
+output: artifacts
+adapter: reference
+adapter_token_env: RBFQA_ADAPTER_TOKEN
+confirmations: 2
+timeout: 3m
+keep_artifacts: false

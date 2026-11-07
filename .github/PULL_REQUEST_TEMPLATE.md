@@ -1,10 +1,11 @@
-Fixes #<issue_number_goes_here>
+## Change
 
-> It's a good idea to open an issue first for discussion.
+Describe the concrete settlement behavior and why it changes.
 
-**Description**
-A brief summary of what this PR does and why.
+## Validation
 
-- [ ] Tests pass
-- [ ] README updated if needed
-- [ ] No breaking changes (or described below)
+List checks actually executed, the Bitcoin Core version, and relevant scenario report paths. State skipped or unavailable integration checks explicitly.
+
+## Compatibility
+
+Describe adapter protocol, storage schema, or CLI behavior changes, if any.

@@ -1,9 +1,7 @@
-# Security Policy
+# Security policy
 
-## Reporting a Vulnerability
+Report vulnerabilities through the repository's private GitHub Security Advisories when available. Include a reproduction and impact; do not include real wallet credentials or production data.
 
-Please do not report security vulnerabilities through public GitHub issues.
+This project supports managed Bitcoin Core 32.1 regtest nodes only. Never configure an adapter against a production merchant tenant. Artifacts contain test transactions, chain evidence, addresses, and local paths. RPC cookies, passwords, and bearer tokens must not appear in published reports.
 
-Instead, report them via GitHub's private [Security Advisories](../../security/advisories/new) feature. Include as much detail as possible: a description of the issue, steps to reproduce, and potential impact.
-
-You can expect an acknowledgment within 48 hours and a resolution timeline once the issue is confirmed.
+Download digests are pinned in `scripts/install-core.sh`. Changes to release sources or hashes require review against official Bitcoin Core release evidence. Do not disable checksum verification to bypass a failed download.

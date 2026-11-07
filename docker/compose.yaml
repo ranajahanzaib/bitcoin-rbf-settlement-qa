@@ -1,0 +1,12 @@
+services:
+  qa:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    init: true
+    network_mode: none
+    volumes:
+      - evidence:/work/artifacts
+    command: ["run", "all", "--timeout", "10m"]
+volumes:
+  evidence:

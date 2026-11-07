@@ -1,0 +1,6 @@
+.git
+artifacts
+.tools
+bin
+dist
+*.sqlite*
