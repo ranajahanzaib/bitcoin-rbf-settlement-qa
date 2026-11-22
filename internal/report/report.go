@@ -68,14 +68,19 @@ func (r Report) Markdown() string {
 		fmt.Fprintf(&b, "Execution failure: %s\n\n", r.Failure)
 	}
 	b.WriteString("| Checkpoint | Invariant | Result | Expected sats | Actual sats |\n|---|---|---|---:|---:|\n")
+	var failures []string
 	for _, a := range r.Assertions {
 		status := "PASS"
 		if !a.Passed {
 			status = "FAIL"
+			failures = append(failures, fmt.Sprintf("- **%s** (`%s`): %s", a.ID, a.Checkpoint, a.Message))
 		}
 		fmt.Fprintf(&b, "| %s | %s | %s | %d | %d |\n", a.Checkpoint, a.ID, status, a.Expected, a.Actual)
-		if !a.Passed {
-			fmt.Fprintf(&b, "\n%s\n\n", a.Message)
+	}
+	if len(failures) > 0 {
+		b.WriteString("\n### Violations\n\n")
+		for _, f := range failures {
+			fmt.Fprintf(&b, "%s\n", f)
 		}
 	}
 	b.WriteString("\n## Transaction timeline\n\n")

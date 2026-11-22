@@ -28,3 +28,26 @@ func TestReportRoundtrip(t *testing.T) {
 		t.Fatalf("bad report %+v", got)
 	}
 }
+
+func TestReportMarkdownFailuresContiguousTable(t *testing.T) {
+	r := Report{
+		RunID:       "test-failure",
+		Scenario:    "duplicate-observer-events",
+		Started:     time.Now().UTC(),
+		ArtifactDir: t.TempDir(),
+		Assertions: []invariant.Result{
+			{ID: "INV-001", Checkpoint: "settled", Passed: false, Message: "No duplicate credit", Expected: 50000, Actual: 100000},
+			{ID: "INV-002", Checkpoint: "settled", Passed: true, Message: "Valid outputs", Expected: 50000, Actual: 100000},
+		},
+	}
+	md := r.Markdown()
+	if !strings.Contains(md, "**FAIL**") {
+		t.Fatalf("expected FAIL in markdown, got:\n%s", md)
+	}
+	if !strings.Contains(md, "### Violations") {
+		t.Fatalf("expected ### Violations section, got:\n%s", md)
+	}
+	if !strings.Contains(md, "| settled | INV-001 | FAIL | 50000 | 100000 |\n| settled | INV-002 | PASS | 50000 | 100000 |") {
+		t.Fatalf("expected contiguous table rows without interleaved message, got:\n%s", md)
+	}
+}
