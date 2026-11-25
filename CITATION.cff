@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use Bitcoin RBF Settlement QA in research or teaching, please cite this software."
+title: "Bitcoin RBF Settlement QA"
+version: 0.1.0
+authors:
+  - family-names: Rana
+    given-names: Jahanzaib
+    orcid: "https://orcid.org/0009-0006-7085-0440"
+repository-code: "https://github.com/ranajahanzaib/bitcoin-rbf-settlement-qa"
+license: MIT
+abstract: "A local Go CLI and verification framework that tests Bitcoin merchant accounting against real Bitcoin Core regtest transactions, mempool replacements (Replace-By-Fee), and competing-chain reorganizations."
+keywords:
+  - bitcoin
+  - replace-by-fee
+  - settlement
+  - accounting
+  - verification
+  - regtest
